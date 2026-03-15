@@ -1,0 +1,65 @@
+import json 
+import os
+import csv
+from loguru import logger
+
+FLAT = "datas/flatten"
+Output = "datas/processed/asteroids.csv"
+
+def Transform():
+    try:
+    
+        os.makedirs("datas/processed",exist_ok=True)
+        rows = []
+        for file in os.listdir(FLAT):
+            if not file.endswith(".json"):
+                continue
+            path = os.path.join(FLAT, file)
+            with open(path, "r") as f:
+                data = json.load(f)
+            
+            for asteroids in data:
+                diameter_min = asteroids["estimated_diameter"]["meters"]["estimated_diameter_min"]
+                diameter_max = asteroids["estimated_diameter"]["meters"]["estimated_diameter_max"]
+            
+                hazardous = asteroids["is_potentially_hazardous_asteroid"]
+
+                close_date = None
+                velocity = None
+                miss_distance = None
+
+                if asteroids["close_approach_data"]:
+                    approach = asteroids["close_approach_data"][0]
+                    close_date = approach["close_approach_date"]
+                    velocity = float(approach["relative_velocity"]["kilometers_per_second"])
+                    miss_distance = float(approach["miss_distance"]["kilometers"])
+                
+                row = {
+                    "asteroid_id": asteroids["id"],
+                    "name": asteroids["name"],
+                    "absolute_magnitude": asteroids["absolute_magnitude_h"],
+                    "diameter_min_m": diameter_min,
+                    "diameter_max_m": diameter_max,
+                    "hazardous": hazardous,
+                    "velocity_km_s": velocity,
+                    "miss_distance_km":miss_distance,
+                    "date": asteroids["date"]
+                }
+
+                rows.append(row)
+        keys = rows[0].keys()
+
+        with open(Output,"w",newline="") as f:
+            writer = csv.DictWriter(f,fieldnames=keys)
+            writer.writeheader()
+            writer.writerows(rows)
+        logger.success("Transform completed!")
+        print("Total rows:", len(rows))
+        print("Reading file:", file)
+        print("Asteroids:", len(data))
+
+    except Exception as e:
+        logger.warning(f"da co loi {e}")
+
+if __name__ == "__main__":
+    Transform()
