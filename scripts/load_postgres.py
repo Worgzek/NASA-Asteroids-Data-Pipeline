@@ -1,0 +1,83 @@
+import psycopg2
+from loguru import logger
+from psycopg2.extras import execute_values
+import sys
+import os
+from dotenv import load_dotenv
+import pandas as pd
+load_dotenv()
+
+PASS = os.getenv("PASS")
+
+def load_postgres():
+    conn = None
+    cur = None
+    try:
+        logger.info("dang doc .csv")
+        df = pd.read_csv("data/processed/asteroids.csv")
+        logger.info(f"da them {len(df)} dong")
+
+        conn = psycopg2.connect(
+            host="localhost",
+            database= "NASA_NEO",
+            user= "postgres",
+            password = PASS
+        )
+        cur = conn.cursor()
+        logger.info("bat dau tao bang")
+        cur.execute("""
+            Create table if not exists Asteroids(
+                asteroid_id INT Primary Key,
+                name VARCHAR(30),
+                absolute_magnitude FLOAT,
+                diameter_min_m FLOAT,
+                diameter_max_m FLOAT,
+                velocity_km_s FLOAT,
+                miss_distance_km FLOAT,
+                date TIMESTAMP,
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+            """)
+        values = df[[
+                'asteroid_id',
+                'name',
+                'absolute_magnitude',
+                'diameter_min_m',
+                'diameter_max_m',
+                'velocity_km_s',
+                'miss_distance_km',
+                'date',
+        ]].values.tolist()
+        logger.info("dang load data")
+        insert_query = """
+            insert into Asteroids(asteroid_id, name, absolute_magnitude, diameter_min_m, diameter_max_m, velocity_km_s, miss_distance_km, date)
+            values %s
+            ON CONFLICT (asteroid_id)
+            DO UPDATE SET
+            velocity_km_s = EXCLUDED.velocity_km_s,
+            miss_distance_km = EXCLUDED.miss_distance_km,
+            name = EXCLUDED.name,
+            absolute_magnitude = EXCLUDED.absolute_magnitude,   
+            diameter_min_m = EXCLUDED.diameter_min_m,
+            diameter_max_m = EXCLUDED.diameter_max_m
+
+            """
+        execute_values(cur, insert_query, values)
+        conn.commit()
+        logger.success("insert thanh cong")
+        logger.info(f"da them: {len(values)} dong")
+    
+    except Exception as e:
+        logger.warning(f"Da co loi xay ra {e}")
+        if conn:
+            conn.rollback()
+        sys.exit()
+
+    finally:
+        if conn:
+            conn.close()
+        if cur:
+            cur.close()
+        logger.info("Da dong ket noi")
+
+if __name__ == "__main__":
+    load_postgres()

@@ -19,7 +19,7 @@ def extract_API():
         os.makedirs("data/raw",exist_ok=True)
 
         while current <= end_date:
-            chunk_end = current + timedelta(days=6)
+            chunk_end = current + timedelta(days=7)
             if chunk_end > end_date:
                 chunk_end = end_date
             url = "https://api.nasa.gov/neo/rest/v1/feed"
@@ -32,7 +32,7 @@ def extract_API():
 
             reponse = requests.get(url, params=params)
             data = reponse.json()
-            filename = f"data/raw/feed_{params['start_date']}_{params['end_date']}.json"
+            filename = f"data/raw/NEO_{params['start_date']}_{params['end_date']}.json"
             with open (filename,"w") as f:
                 json.dump(data,f,indent=4)
             logger.success("Da luu thanh cong", filename)

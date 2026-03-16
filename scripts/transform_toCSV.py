@@ -22,7 +22,6 @@ def Transform():
                 diameter_min = asteroids["estimated_diameter"]["meters"]["estimated_diameter_min"]
                 diameter_max = asteroids["estimated_diameter"]["meters"]["estimated_diameter_max"]
             
-                hazardous = asteroids["is_potentially_hazardous_asteroid"]
 
                 close_date = None
                 velocity = None
@@ -34,19 +33,28 @@ def Transform():
                     velocity = float(approach["relative_velocity"]["kilometers_per_second"])
                     miss_distance = float(approach["miss_distance"]["kilometers"])
                 
+                if velocity is None or miss_distance is None:
+                    continue
+
+                if diameter_max <= 0 or velocity <= 0 or miss_distance <= 0:
+                    continue               
+                
                 row = {
                     "asteroid_id": asteroids["id"],
                     "name": asteroids["name"],
                     "absolute_magnitude": asteroids["absolute_magnitude_h"],
                     "diameter_min_m": diameter_min,
                     "diameter_max_m": diameter_max,
-                    "hazardous": hazardous,
                     "velocity_km_s": velocity,
                     "miss_distance_km":miss_distance,
                     "date": asteroids["date"]
                 }
 
                 rows.append(row)
+        
+        if not rows:
+            logger.warning("No data to transform")
+            return
         keys = rows[0].keys()
 
         with open(Output,"w",newline="") as f:
