@@ -3,13 +3,13 @@ import os
 import csv
 from loguru import logger
 
-FLAT = "datas/flatten"
-Output = "datas/processed/asteroids.csv"
+FLAT = "data/flatten"
+Output = "data/processed/asteroids.csv"
 
 def Transform():
     try:
-    
-        os.makedirs("datas/processed",exist_ok=True)
+        logger.info("Bat dau Transform .JSON -> .CSV")
+        os.makedirs("data/processed",exist_ok=True)
         rows = []
         for file in os.listdir(FLAT):
             if not file.endswith(".json"):
@@ -53,10 +53,8 @@ def Transform():
             writer = csv.DictWriter(f,fieldnames=keys)
             writer.writeheader()
             writer.writerows(rows)
-        logger.success("Transform completed!")
-        print("Total rows:", len(rows))
-        print("Reading file:", file)
-        print("Asteroids:", len(data))
+        logger.success("Transform thanh cong")
+
 
     except Exception as e:
         logger.warning(f"da co loi {e}")

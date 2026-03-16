@@ -1,0 +1,6 @@
+FROM apache/airflow:2.8.1
+USER root
+RUN apt-get update && apt-get install -y libpq-dev gcc
+
+USER airflow
+RUN pip install -r requirements.txt

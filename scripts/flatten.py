@@ -2,12 +2,12 @@ import json
 import os
 from loguru import logger
 
-RAW = "datas/raw"
-FLAT = "datas/flatten"
+RAW = "data/raw"
+FLAT = "data/flatten"
 
 def flatten_data():
     try:
-
+        logger.info("bat dau flatten")
         os.makedirs(FLAT,exist_ok=True)
 
         for file in os.listdir(RAW):
@@ -27,7 +27,7 @@ def flatten_data():
             output_file = os.path.join(FLAT, f"flat_{file}")
             with open(output_file, "w") as f:
                 json.dump(flat_list,f,indent=4)
-            logger.info(f"flattened {file}")
+            logger.success(f"flattened {file}")
 
     except Exception as e:
         logger.warning(f"co loi {e}")
