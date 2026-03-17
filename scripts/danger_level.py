@@ -15,7 +15,7 @@ def danger_score():
         logger.info("dang ket noi Database")
 
         conn = psycopg2.connect(
-            host="localhost",
+            host="host.docker.internal",
             database= "NASA_NEO",
             user= "postgres",
             password = PASS
@@ -111,6 +111,5 @@ def danger_score():
             cur.close()
 if __name__ == "__main__":
     danger_score()
-
 
 

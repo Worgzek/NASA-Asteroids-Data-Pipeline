@@ -9,6 +9,7 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags # Mount thư mục dags từ host vào container
     - ./scripts:/opt/airflow/scripts # Mount thư mục scripts từ host vào container
     - ./plugins:/opt/airflow/plugins # Mount thư mục plugins từ host vào container
+    - ./data:/opt/airflow/data
     
 services:
   postgres:

@@ -18,7 +18,7 @@ def load_postgres():
         logger.info(f"da them {len(df)} dong")
 
         conn = psycopg2.connect(
-            host="localhost",
+            host="host.docker.internal",
             database= "NASA_NEO",
             user= "postgres",
             password = PASS
