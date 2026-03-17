@@ -22,21 +22,12 @@ default_args = {
     "retries" : 3,
     "retries_delay" : timedelta(minutes=1)
 }
-DB_ENV = {
-    "DB_HOST": "postgres",
-    "DB_PORT": "5432",
-    "DB_NAME": "airflow",
-    "DB_USER": "airflow",
-    "DB_PASS": "airflow",
-    "CSV_PATH": "/opt/airflow/data/processed/asteroids.csv"
-}
-
 with DAG(
     dag_id= DAG_ID,
     description= "Extract API -> JSON -> CSV -> Postgres -> DW -> Analytics Task using ETL + Airflow",
     default_args= default_args,
     start_date= days_ago(1),
-    schedule_interval = None,
+    schedule_interval = "@daily",
     catchup= False,
     tags= ["nasa","etl","asteroid"]
 ) as dag:
