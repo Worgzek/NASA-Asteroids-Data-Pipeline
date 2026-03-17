@@ -13,6 +13,7 @@ x-airflow-common:
     - ./scripts:/opt/airflow/scripts # Mount thư mục scripts từ host vào container
     - ./plugins:/opt/airflow/plugins # Mount thư mục plugins từ host vào container
     - ./data:/opt/airflow/data
+    - ./.env:/opt/airflow/.env
     
 services:
   postgres:

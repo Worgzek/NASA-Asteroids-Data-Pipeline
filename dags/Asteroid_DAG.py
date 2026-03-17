@@ -8,7 +8,7 @@ from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
 
 DAG_ID = "nasa_neo_etl_pipeline"
-PYTHON = "python"
+PYTHON = "python3"
 
 EXTRACT_API = "/opt/airflow/scripts/extract_api.py"
 TRANSFORM_FLATTEN = "/opt/airflow/scripts/transform_flatten.py"
@@ -35,27 +35,27 @@ with DAG(
     
     extract = BashOperator(
         task_id = "extract_API_to_JSON",
-        bash_command = f"{PYTHON} '{EXTRACT_API}'",
+        bash_command = f"{PYTHON} {EXTRACT_API} '{{{{ ds }}}}'",
     )
 
     transform_flatten = BashOperator(
         task_id = "flatten_JSON",
-        bash_command = f"{PYTHON} '{TRANSFORM_FLATTEN}'",
+        bash_command = f"{PYTHON} {TRANSFORM_FLATTEN} '{{{{ ds }}}}'",
     )
 
     transform_csv = BashOperator(
         task_id = "clean_and_validate_to_CSV",
-        bash_command = f"{PYTHON} '{TRANSFORM_CSV}'",
+        bash_command = f"{PYTHON} {TRANSFORM_CSV} '{{{{ ds }}}}'",
     )
 
     load_to_postgre = BashOperator(
         task_id = "load_CSV_to_DW",
-        bash_command = f"{PYTHON} '{LOAD_POSTGRES}'",
+        bash_command = f"{PYTHON} {LOAD_POSTGRES} '{{{{ ds }}}}'",
     )
 
     danger_level = BashOperator(
         task_id = "calculate_danger_level",
-        bash_command = f"{PYTHON} '{CAL_DANGER_LEVEL}'",
+        bash_command = f"{PYTHON} {CAL_DANGER_LEVEL} '{{{{ ds }}}}'",
     )
 
     end = EmptyOperator(task_id="end")

@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import sys
 from datetime import datetime, timedelta
 from loguru import logger
 from dotenv import load_dotenv
@@ -8,39 +9,32 @@ load_dotenv()
 
 API_KEY = os.getenv("NASA_API_KEY")
 
-def extract_API():
+def extract_API(run_date):
     try:
-        logger.info("Bat dau Extract")
+        logger.info(f"Bat dau Extract ngay {run_date}")
+        os.makedirs("/opt/airflow/data/raw",exist_ok=True)
 
-        start_date = datetime(2026,2,15)
-        end_date = datetime(2026,2,22)
-        current = start_date
+        url = "https://api.nasa.gov/neo/rest/v1/feed"     
+        params = {
+            "start_date": run_date,
+            "end_date": run_date,
+            "api_key": API_KEY
+        }
 
-        os.makedirs("data/raw",exist_ok=True)
+        response = requests.get(url, params=params)
+        if response.status_code != 200:
+            raise Exception(f"API failed: {response.status_code}")
+        data = response.json()
 
-        while current <= end_date:
-            chunk_end = current + timedelta(days=7)
-            if chunk_end > end_date:
-                chunk_end = end_date
-            url = "https://api.nasa.gov/neo/rest/v1/feed"
-
-            params = {
-                "start_date": current.strftime("%Y-%m-%d"),
-                "end_date": chunk_end.strftime("%Y-%m-%d"),
-                "api_key": API_KEY
-            }
-
-            reponse = requests.get(url, params=params)
-            data = reponse.json()
-            filename = f"data/raw/NEO_{params['start_date']}_{params['end_date']}.json"
-            with open (filename,"w") as f:
-                json.dump(data,f,indent=4)
-            logger.success("Da luu thanh cong", filename)
-
-            current = chunk_end + timedelta(days=1)
+        filename = f"/opt/airflow/data/raw/NEO_{run_date}.json"
+        with open (filename,"w") as f:
+            json.dump(data,f,indent=4)
+        logger.success("Da luu thanh cong", filename)
 
     except Exception as e:
         logger.warning(f"co loi xay ra {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    extract_API()
+    run_date = sys.argv[1] if len(sys.argv) > 1 else None
+    extract_API(run_date)

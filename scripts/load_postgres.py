@@ -9,12 +9,12 @@ load_dotenv()
 
 PASS = os.getenv("PASS")
 
-def load_postgres():
+def load_postgres(run_date):
     conn = None
     cur = None
     try:
         logger.info("dang doc .csv")
-        df = pd.read_csv("data/processed/asteroids.csv")
+        df = pd.read_csv(f"/opt/airflow/data/processed/asteroids_{run_date}.csv")
         logger.info(f"da them {len(df)} dong")
 
         conn = psycopg2.connect(
@@ -27,7 +27,7 @@ def load_postgres():
         logger.info("bat dau tao bang")
         cur.execute("""
             Create table if not exists Asteroids(
-                asteroid_id INT Primary Key,
+                asteroid_id BIGINT,
                 name VARCHAR(30),
                 absolute_magnitude FLOAT,
                 diameter_min_m FLOAT,
@@ -35,7 +35,8 @@ def load_postgres():
                 velocity_km_s FLOAT,
                 miss_distance_km FLOAT,
                 date TIMESTAMP,
-                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (asteroid_id, date))
             """)
         values = df[[
                 'asteroid_id',
@@ -51,26 +52,29 @@ def load_postgres():
         insert_query = """
             insert into Asteroids(asteroid_id, name, absolute_magnitude, diameter_min_m, diameter_max_m, velocity_km_s, miss_distance_km, date)
             values %s
-            ON CONFLICT (asteroid_id)
+            ON CONFLICT (asteroid_id, date)
             DO UPDATE SET
             velocity_km_s = EXCLUDED.velocity_km_s,
             miss_distance_km = EXCLUDED.miss_distance_km,
             name = EXCLUDED.name,
             absolute_magnitude = EXCLUDED.absolute_magnitude,   
             diameter_min_m = EXCLUDED.diameter_min_m,
-            diameter_max_m = EXCLUDED.diameter_max_m
-
+            diameter_max_m = EXCLUDED.diameter_max_m,
+            last_updated = CURRENT_TIMESTAMP
             """
         execute_values(cur, insert_query, values)
         conn.commit()
         logger.success("insert thanh cong")
         logger.info(f"da them: {len(values)} dong")
+        
+        logger.info(f"RUN DATE: {run_date}")
+        logger.info(f"FILE PATH: /opt/airflow/data/processed/asteroids_{run_date}.csv")
     
     except Exception as e:
         logger.warning(f"Da co loi xay ra {e}")
         if conn:
             conn.rollback()
-        sys.exit()
+        sys.exit(1)
 
     finally:
         if conn:
@@ -80,4 +84,5 @@ def load_postgres():
         logger.info("Da dong ket noi")
 
 if __name__ == "__main__":
-    load_postgres()
+    run_date = sys.argv[1]
+    load_postgres(run_date)

@@ -25,7 +25,7 @@ def danger_score():
         logger.info("bat dau tao bang")
         cur.execute("""
             create table if not exists danger_score(
-                asteroid_id INT Primary Key,
+                asteroid_id BIGINT Primary Key,
                 name VARCHAR(30),
                 diameter_max_m FLOAT,
                 velocity_km_s FLOAT,
@@ -70,8 +70,8 @@ def danger_score():
 
                     date
 
-                FROM asteroids
-            )
+                FROM Asteroids
+            ) as sub
 
             ORDER BY risk_score DESC;
             """
