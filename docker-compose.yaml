@@ -22,8 +22,10 @@ services:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=123
       - POSTGRES_DB=airflow
+    volumes:
+      - ./data/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5433:5433"
+      - "5433:5432"
     
   airflow-init:
     <<: *airflow-common
@@ -43,7 +45,7 @@ services:
     <<: *airflow-common
     command: webserver
     ports:
-      - "8181:8181" # Cổng để chúng ta truy cập UI
+      - "8181:8080" # Cổng để chúng ta truy cập UI
     depends_on:
       airflow-init:
         condition: service_completed_successfully

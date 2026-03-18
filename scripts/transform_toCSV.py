@@ -68,7 +68,6 @@ def Transform(run_date):
             writer.writerows(rows)
         logger.success(f"Transform thanh cong {run_date}")
 
-
     except Exception as e:
         logger.warning(f"da co loi {e}")
         sys.exit(1)

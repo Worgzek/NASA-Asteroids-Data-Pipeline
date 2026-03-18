@@ -16,7 +16,7 @@ def danger_score():
 
         conn = psycopg2.connect(
             host="postgres",
-            database= "airflow",
+            database= "nasa_neo",
             user= "airflow",
             password = PASS
             )

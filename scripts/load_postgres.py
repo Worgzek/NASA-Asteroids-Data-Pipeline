@@ -19,7 +19,7 @@ def load_postgres(run_date):
 
         conn = psycopg2.connect(
             host="postgres",
-            database= "airflow",
+            database= "nasa_neo",
             user= "airflow",
             password = PASS
         )
