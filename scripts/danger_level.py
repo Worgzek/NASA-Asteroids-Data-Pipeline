@@ -15,9 +15,9 @@ def danger_score():
         logger.info("dang ket noi Database")
 
         conn = psycopg2.connect(
-            host="host.docker.internal",
-            database= "NASA_NEO",
-            user= "postgres",
+            host="postgres",
+            database= "airflow",
+            user= "airflow",
             password = PASS
             )
         cur = conn.cursor()

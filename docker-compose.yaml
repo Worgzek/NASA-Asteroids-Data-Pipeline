@@ -6,7 +6,7 @@ x-airflow-common:
     - .env
   environment:
     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:123@postgres/airflow
     - AIRFLOW__CORE__LOAD_EXAMPLES=False # Tắt các DAG mẫu cho đỡ rác
   volumes:
     - ./dags:/opt/airflow/dags # Mount thư mục dags từ host vào container
@@ -20,17 +20,17 @@ services:
     image: postgres:13
     environment:
       - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_PASSWORD=123
       - POSTGRES_DB=airflow
     ports:
-      - "5433:5432"
+      - "5433:5433"
     
   airflow-init:
     <<: *airflow-common
     command: version
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:123@postgres/airflow
       - _AIRFLOW_DB_UPGRADE=true
       - _AIRFLOW_WWW_USER_CREATE=true # TỰ ĐỘNG TẠO USER ADMIN
       - _AIRFLOW_WWW_USER_USERNAME=admin
@@ -43,7 +43,7 @@ services:
     <<: *airflow-common
     command: webserver
     ports:
-      - "8080:8080" # Cổng để chúng ta truy cập UI
+      - "8181:8181" # Cổng để chúng ta truy cập UI
     depends_on:
       airflow-init:
         condition: service_completed_successfully

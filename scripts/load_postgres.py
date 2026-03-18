@@ -18,9 +18,9 @@ def load_postgres(run_date):
         logger.info(f"da them {len(df)} dong")
 
         conn = psycopg2.connect(
-            host="host.docker.internal",
-            database= "NASA_NEO",
-            user= "postgres",
+            host="postgres",
+            database= "airflow",
+            user= "airflow",
             password = PASS
         )
         cur = conn.cursor()
