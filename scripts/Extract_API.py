@@ -9,9 +9,21 @@ load_dotenv()
 
 API_KEY = os.getenv("NASA_API_KEY")
 
+run_date = sys.argv[1]
+LOG_FILE = f"/opt/airflow/logs/pipeline_{run_date}.log"
+logger.remove()
+logger.add(sys.stdout, level="INFO")
+logger.add(
+    LOG_FILE,
+    rotation="10 MB",
+    retention="7 days",
+    level="INFO",
+    format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"
+)
+
 def extract_API(run_date):
     try:
-        logger.info(f"Bat dau Extract ngay {run_date}")
+        logger.info(f"Bat dau extract api ngay {run_date}")
         os.makedirs("/opt/airflow/data/raw",exist_ok=True)
 
         url = "https://api.nasa.gov/neo/rest/v1/feed"     
@@ -23,18 +35,18 @@ def extract_API(run_date):
 
         response = requests.get(url, params=params)
         if response.status_code != 200:
-            raise Exception(f"API failed: {response.status_code}")
+            raise Exception(f"lay api khong thanh cong: {response.status_code}")
         data = response.json()
 
         filename = f"/opt/airflow/data/raw/NEO_{run_date}.json"
+
         with open (filename,"w") as f:
             json.dump(data,f,indent=4)
-        logger.success("Da luu thanh cong", filename)
+        logger.success(f"Da luu thanh cong {filename}\n------------------------------------------------------")
 
     except Exception as e:
-        logger.warning(f"co loi xay ra {e}")
+        logger.exception(f"co loi xay ra {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
-    run_date = sys.argv[1] if len(sys.argv) > 1 else None
     extract_API(run_date)

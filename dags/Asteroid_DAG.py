@@ -29,7 +29,7 @@ with DAG(
     start_date= days_ago(1),
     schedule_interval = "@daily",
     catchup= False,
-    tags= ["nasa","etl","asteroid"]
+    tags= ["nasa","etl","asteroids"]
 ) as dag:
     start = EmptyOperator(task_id = "start")
     
@@ -60,9 +60,4 @@ with DAG(
 
     end = EmptyOperator(task_id="end")
 
-    start >> extract >> transform_flatten >> transform_csv >> load_to_postgre >> danger_level >> end
-
-
-
-
-
+    start >> extract >> transform_flatten >> transform_csv >> load_to_postgre >> [danger_level] >> end

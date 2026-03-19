@@ -9,6 +9,18 @@ load_dotenv()
 
 PASS = os.getenv("PASS")
 
+run_date = sys.argv[1]
+LOG_FILE = f"/opt/airflow/logs/pipeline_{run_date}.log"
+logger.remove()
+logger.add(sys.stdout, level="INFO")
+logger.add(
+    LOG_FILE,
+    rotation="10 MB",
+    retention="7 days",
+    level="INFO",
+    format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"
+)
+
 def load_postgres(run_date):
     conn = None
     cur = None
@@ -64,14 +76,10 @@ def load_postgres(run_date):
             """
         execute_values(cur, insert_query, values)
         conn.commit()
-        logger.success("insert thanh cong")
-        logger.info(f"da them: {len(values)} dong")
-        
-        logger.info(f"RUN DATE: {run_date}")
-        logger.info(f"FILE PATH: /opt/airflow/data/processed/asteroids_{run_date}.csv")
+        logger.success(f"insert thanh cong {len(values)} dong\n------------------------------------------------------")
     
     except Exception as e:
-        logger.warning(f"Da co loi xay ra {e}")
+        logger.exception(f"Da co loi xay ra {e}")
         if conn:
             conn.rollback()
         sys.exit(1)

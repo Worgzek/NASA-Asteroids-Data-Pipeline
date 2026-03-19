@@ -6,6 +6,18 @@ from loguru import logger
 
 FLAT = "/opt/airflow/data/flatten"
 
+run_date = sys.argv[1]
+LOG_FILE = f"/opt/airflow/logs/pipeline_{run_date}.log"
+logger.remove()
+logger.add(sys.stdout, level="INFO")
+logger.add(
+    LOG_FILE,
+    rotation="10 MB",
+    retention="7 days",
+    level="INFO",
+    format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"
+)
+
 def Transform(run_date):
     try:
         Output = f"/opt/airflow/data/processed/asteroids_{run_date}.csv"
@@ -66,10 +78,10 @@ def Transform(run_date):
             writer = csv.DictWriter(f,fieldnames=keys)
             writer.writeheader()
             writer.writerows(rows)
-        logger.success(f"Transform thanh cong {run_date}")
+        logger.success(f"Transform thanh cong {run_date}\n------------------------------------------------------")
 
     except Exception as e:
-        logger.warning(f"da co loi {e}")
+        logger.exception(f"da co loi {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

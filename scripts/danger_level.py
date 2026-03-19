@@ -8,6 +8,18 @@ load_dotenv()
 
 PASS = os.getenv("PASS")
 
+run_date = sys.argv[1]
+LOG_FILE = f"/opt/airflow/logs/pipeline_{run_date}.log"
+logger.remove()
+logger.add(sys.stdout, level="INFO")
+logger.add(
+    LOG_FILE,
+    rotation="10 MB",
+    retention="7 days",
+    level="INFO",
+    format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"
+)
+
 def danger_score():
     conn = None
     cur = None
@@ -93,13 +105,11 @@ def danger_score():
             """
         execute_values(cur,insert_query,results)
         conn.commit()
-        logger.success("da fetch thanh cong")
+        logger.success(f"da fetch thanh cong {len(results)} dong\n------------------------------------------------------")
         sys.exit(0)
 
-
-
     except Exception as e:
-        logger.warning(f"da co loi xay ra {e}")
+        logger.exception(f"da co loi xay ra {e}")
         if conn:
             conn.rollback()
         sys.exit(1)
