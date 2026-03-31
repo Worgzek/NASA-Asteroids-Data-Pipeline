@@ -333,15 +333,15 @@
                 "close_approach_date_full": "2026-Mar-30 04:56",
                 "epoch_date_close_approach": 1774846560000,
                 "relative_velocity": {
-                    "kilometers_per_second": "7.1716760503",
-                    "kilometers_per_hour": "25818.0337809369",
-                    "miles_per_hour": "16042.3221568272"
+                    "kilometers_per_second": "7.1728116186",
+                    "kilometers_per_hour": "25822.1218268454",
+                    "miles_per_hour": "16044.8623095752"
                 },
                 "miss_distance": {
-                    "astronomical": "0.0954396749",
-                    "lunar": "37.1260335361",
-                    "kilometers": "14277572.078532463",
-                    "miles": "8871671.9047074694"
+                    "astronomical": "0.0954539842",
+                    "lunar": "37.1315998538",
+                    "kilometers": "14279712.719333654",
+                    "miles": "8873002.0372222652"
                 },
                 "orbiting_body": "Earth"
             }

@@ -1,55 +1,51 @@
+version: "3.8"
+
 x-airflow-common:
   &airflow-common
-  build: . # Bảo docker build từ file Dockerfile nằm cùng thư mục
-
+  build: .
   env_file:
     - .env
-  environment:
-    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:123@postgres/airflow
-    - AIRFLOW__CORE__LOAD_EXAMPLES=False # Tắt các DAG mẫu cho đỡ rác
   volumes:
-    - ./dags:/opt/airflow/dags # Mount thư mục dags từ host vào container
-    - ./scripts:/opt/airflow/scripts # Mount thư mục scripts từ host vào container
-    - ./plugins:/opt/airflow/plugins # Mount thư mục plugins từ host vào container
+    - ./dags:/opt/airflow/dags
+    - ./scripts:/opt/airflow/scripts
+    - ./plugins:/opt/airflow/plugins
     - ./data:/opt/airflow/data
-    - ./.env:/opt/airflow/.env
-    
+
 services:
   postgres:
     image: postgres:13
-    environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_DB=airflow
+    env_file:
+      - .env
     volumes:
       - ./data/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5433:5432"
-    
+
   airflow-init:
     <<: *airflow-common
-    command: version
-    environment:
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:123@postgres/airflow
-      - _AIRFLOW_DB_UPGRADE=true
-      - _AIRFLOW_WWW_USER_CREATE=true # TỰ ĐỘNG TẠO USER ADMIN
-      - _AIRFLOW_WWW_USER_USERNAME=admin
-      - _AIRFLOW_WWW_USER_PASSWORD=admin
-      - _AIRFLOW_WWW_USER_ROLE=Admin
+    command: >
+      bash -c "
+      airflow db upgrade &&
+      airflow users create
+      --username ${_AIRFLOW_WWW_USER_USERNAME}
+      --password ${_AIRFLOW_WWW_USER_PASSWORD}
+      --firstname admin
+      --lastname user
+      --role ${_AIRFLOW_WWW_USER_ROLE}
+      --email admin@example.com
+      "
     depends_on:
       - postgres
-  
+
   airflow-webserver:
     <<: *airflow-common
     command: webserver
     ports:
-      - "8181:8080" # Cổng để chúng ta truy cập UI
+      - "8181:8080"
     depends_on:
       airflow-init:
         condition: service_completed_successfully
-  
+
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
