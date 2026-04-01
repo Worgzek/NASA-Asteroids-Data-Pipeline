@@ -33,7 +33,7 @@ def extract_API(run_date):
             "api_key": API_KEY
         }
 
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=120)
         if response.status_code != 200:
             raise Exception(f"lay api khong thanh cong: {response.status_code}")
         data = response.json()
