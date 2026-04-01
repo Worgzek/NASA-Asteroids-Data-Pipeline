@@ -1,5 +1,8 @@
-# NASA Asteroid ETL Pipeline 🚀
-
+# ☄️  NASA Asteroid ETL Pipeline
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![Airflow](https://img.shields.io/badge/Apache%20Airflow-2.x-green?logo=apache-airflow)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-blue?logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)
 ## Giới thiệu
 
 Đây là project xây dựng **pipeline ETL** để thu thập và xử lý dữ liệu **tiểu hành tinh gần Trái Đất (Near-Earth Asteroids)** từ API công khai của NASA, dữ liệu sẽ được lấy hằng ngày theo thời gian thực.
