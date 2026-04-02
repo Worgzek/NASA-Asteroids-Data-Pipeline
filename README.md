@@ -1,33 +1,33 @@
-# ☄️  NASA Asteroid ETL Pipeline
+# ☄️ NASA Asteroid ETL Pipeline
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
 ![Airflow](https://img.shields.io/badge/Apache%20Airflow-2.x-green?logo=apache-airflow)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-blue?logo=postgresql)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)
-## Giới thiệu
+## Introduction
 
-Đây là project xây dựng **pipeline ETL** để thu thập và xử lý dữ liệu **tiểu hành tinh gần Trái Đất (Near-Earth Asteroids)** từ API công khai của NASA, dữ liệu sẽ được lấy hằng ngày theo thời gian thực.
+This project builds an **ETL pipeline** to collect and process **Near-Earth Asteroids (NEOs)** data from NASA’s public API. The data is fetched daily in near real-time.
 
-Pipeline thực hiện các bước:
----
+The pipeline performs the following steps:
 
-   - Thu thập dữ liệu từ NASA API
-   - Xử lý dữ liệu JSON phức tạp
-   - Chuyển đổi dữ liệu sang dạng CSV
-   - Kiểm tra và làm sạch dữ liệu
-   - Load dữ liệu vào PostgreSQL
-   - Tính toán mức độ nguy hiểm (risk score) của các tiểu hành tinh
-   - Dự án cũng sử dụng Apache Airflow để tự động hóa pipeline và Docker để chạy môi trường.
+- Extract data from NASA API  
+- Process complex JSON data  
+- Convert data into CSV format  
+- Validate and clean data  
+- Load data into PostgreSQL  
+- Calculate asteroid risk scores  
+- Automate the pipeline using Apache Airflow and run the environment with Docker  
 
-Dữ liệu được lấy từ:
-NASA Near Earth Object Web Service API
+Data source:  
+NASA Near Earth Object Web Service API  
 https://api.nasa.gov/
 
 ---
 
-# Cấu trúc project
+# Project Structure
 
 ```
-API này cung cấp thông tin về các tiểu hành tinh đang bay gần Trái Đất.
+API provides information about asteroids approaching Earth.
+
 nasa_asteroid_ETL_Project
 │
 ├── dags/
@@ -45,127 +45,123 @@ nasa_asteroid_ETL_Project
 │   ├── flatten/
 │   └── processed/
 │   └── init.sql
-
+│
 ├── logs/
 │
 ├── docker-compose.yml
 ├── Dockerfile
 └── requirements.txt
+└── .env
 ```
 
 ---
 
-# Luồng dữ liệu (Pipeline)
+# Data Pipeline Flow
 
 ```
-Pipeline xử lý dữ liệu theo thứ tự:
+The pipeline processes data in the following order:
 
 NASA API
    ↓
-Extract dữ liệu JSON
+Extract JSON data
    ↓
-Flatten dữ liệu (JSON lồng nhau → dữ liệu phẳng)
+Flatten data (nested JSON → tabular format)
    ↓
 Transform → CSV
    ↓
-Transform dữ liệu → CSV 
+Clean and transform data → CSV
    ↓
-Load vào PostgreSQL
+Load into PostgreSQL
    ↓
-Tính toán risk_score
+Calculate risk_score
 ```
 
 ---
 
-# Công thức Risk Score
+# Risk Score Formula
 
-Risk score được tính dựa trên:
+The risk score is calculated based on:
 
-   - Kích thước tối đa
-   - Vận tốc
-   - Khoảng cách tới Trái Đất
+- Maximum diameter  
+- Velocity  
+- Distance to Earth  
 
 ```
-Công thức tính Risk Score:
-
 risk_score =
 (diameter_max_m / 1000) * 4
 + (velocity_km_s / 30) * 3
 + (7500000 / miss_distance_km) * 3
 ```
 
-Phân loại mức nguy hiểm:
+### Danger Level Classification
 
 | Risk Score | Danger Level |
-|------------|--------------|
-| ≥ 8 | EXTREME |
-| ≥ 6 | HIGH |
-| ≥ 4 | MEDIUM |
-| < 4 | LOW |
+|------------|-------------|
+| ≥ 8        | EXTREME     |
+| ≥ 6        | HIGH        |
+| ≥ 4        | MEDIUM      |
+| < 4        | LOW         |
 
 ---
 
-# Công nghệ sử dụng
-```
-Công nghệ sử dụng:
+# Technologies Used
 
-Project sử dụng các công nghệ sau:
-
-   - Python
-   - PostgreSQL
-   - Apache Airflow
-   - Docker
-   - Loguru (logging)
-   - Pandas
-
-```
+- Python  
+- PostgreSQL  
+- Apache Airflow  
+- Docker  
+- Loguru (logging)  
+- Pandas  
 
 ---
 
-# Cách chạy project
+# How to Run the Project
 
-Chạy môi trường bằng Docker:
+Run the environment using Docker:
 
 ```bash
 docker compose up
 ```
 
-Mở giao diện Airflow:
+Access the Airflow UI:
 
 ```
 http://localhost:8081
 ```
 
-Thông tin đăng nhập mặc định:
+Default login credentials:
 
 ```
 username: admin
 password: admin
 ```
 
-Trigger DAG để chạy toàn bộ pipeline.
+Trigger the DAG to run the entire pipeline.
 
-Cách connect Database:
+### Database Connection
+
 ```
-register - server
-   - host name: localhost
-   - port: 5433
-   - maintenance database: airflow
-   - username: airflow
-   - password: 123
+Register Server:
+
+- host name: localhost
+- port: 5433
+- maintenance database: airflow
+- username: airflow
+- password: 123
 ```
+
 ---
 
-# Kết quả
+# Results
 
-Dữ liệu được lưu ở PostgreSQL trong Database nasa_neo với các bảng:
+Data is stored in PostgreSQL database **nasa_neo** with the following tables:
 
 ```
 asteroids
 danger_score
 ```
 
-Các cột dữ liệu:
+### Table Columns
 
 ```
 asteroid_id
@@ -182,11 +178,8 @@ date
 
 # Logging
 
-Log pipeline được lưu tại:
+Pipeline logs are stored in:
 
 ```
 logs/
 ```
-
----
-
