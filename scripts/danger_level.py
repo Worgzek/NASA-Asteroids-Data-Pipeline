@@ -45,7 +45,8 @@ def danger_score():
                 risk_score FLOAT,
                 danger_level VARCHAR(10),                            
                 date TIMESTAMP,
-                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP                            
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                primary key(asteroid_id, date)
                     )
             """)
         logger.info("thuc hien task")
