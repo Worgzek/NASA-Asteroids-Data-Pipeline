@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 DAG_ID = "nasa_neo_etl_pipeline"
 PYTHON = "python3"
 
-EXTRACT_API = "/opt/airflow/scripts/extract_api.py"
+EXTRACT_API = "/opt/airflow/scripts/Extract_API.py"
 TRANSFORM_FLATTEN = "/opt/airflow/scripts/transform_flatten.py"
 TRANSFORM_CSV = "/opt/airflow/scripts/transform_toCSV.py"
 LOAD_POSTGRES = "/opt/airflow/scripts/load_postgres.py"
@@ -20,7 +20,7 @@ default_args = {
     "owner" : "hieu",
     "depends_on_past" : False,
     "retries" : 3,
-    "retries_delay" : timedelta(minutes=1)
+    "retry_delay" : timedelta(minutes=1)
 }
 with DAG(
     dag_id= DAG_ID,
