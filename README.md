@@ -31,10 +31,10 @@ API provides information about asteroids approaching Earth.
 nasa_asteroid_ETL_Project
 │
 ├── dags/
-│   └── nasa_pipeline.py
+│   └── Asteroid_DAG.py
 │
 ├── scripts/
-│   ├── extract_api.py
+│   ├── Extract_API.py
 │   ├── flatten_data.py
 │   ├── transform_data.py
 │   ├── load_postgres.py
