@@ -5,6 +5,7 @@ import sys
 import os
 from dotenv import load_dotenv
 import pandas as pd
+from db_log import log_ETL
 load_dotenv()
 
 PASS = os.getenv("PASS")
@@ -77,9 +78,12 @@ def load_postgres(run_date):
         execute_values(cur, insert_query, values)
         conn.commit()
         logger.success(f"insert thanh cong {len(values)} dong\n------------------------------------------------------")
-    
+        log_ETL(run_date, "load to DB", "success", len(values), "da load vao database thanh cong")
+
     except Exception as e:
         logger.exception(f"Da co loi xay ra {e}")
+        log_ETL(run_date, "load to DB", "failed", len(values), f"da co loi xay ra {e}")
+
         if conn:
             conn.rollback()
         sys.exit(1)

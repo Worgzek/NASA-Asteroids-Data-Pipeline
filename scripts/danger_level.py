@@ -4,6 +4,7 @@ import os
 import sys
 from loguru import logger
 from dotenv import load_dotenv
+from db_log import log_ETL
 load_dotenv()
 
 PASS = os.getenv("PASS")
@@ -20,7 +21,7 @@ logger.add(
     format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"
 )
 
-def danger_score():
+def danger_score(run_date):
     conn = None
     cur = None
     try:
@@ -37,7 +38,7 @@ def danger_score():
         logger.info("bat dau tao bang")
         cur.execute("""
             create table if not exists danger_score(
-                asteroid_id BIGINT Primary Key,
+                asteroid_id BIGINT,
                 name VARCHAR(30),
                 diameter_max_m FLOAT,
                 velocity_km_s FLOAT,
@@ -94,7 +95,7 @@ def danger_score():
         insert_query = """
             insert into danger_score(asteroid_id, name, diameter_max_m, velocity_km_s, miss_distance_km, risk_score, danger_level, date)
             values %s
-            on conflict(asteroid_id) do update set
+            on conflict(asteroid_id, date) do update set
                 name = excluded.name,
                 diameter_max_m = excluded.diameter_max_m,
                 velocity_km_s = excluded.velocity_km_s,
@@ -107,10 +108,12 @@ def danger_score():
         execute_values(cur,insert_query,results)
         conn.commit()
         logger.success(f"da fetch thanh cong {len(results)} dong\n------------------------------------------------------")
-        sys.exit(0)
+        log_ETL(run_date, "calculate danger level", "success", len(results), f"da load vao DB thanh cong")
 
     except Exception as e:
         logger.exception(f"da co loi xay ra {e}")
+        log_ETL(run_date, "calculate danger level", "failed", None, f"da co loi xay ra {e}")
+
         if conn:
             conn.rollback()
         sys.exit(1)
@@ -121,6 +124,6 @@ def danger_score():
         if cur:
             cur.close()
 if __name__ == "__main__":
-    danger_score()
+    danger_score(run_date)
 
 

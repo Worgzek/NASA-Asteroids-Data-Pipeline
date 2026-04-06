@@ -3,6 +3,7 @@ import os
 import csv
 import sys
 from loguru import logger
+from db_log import log_ETL
 
 FLAT = "/opt/airflow/data/flatten"
 
@@ -79,9 +80,13 @@ def Transform(run_date):
             writer.writeheader()
             writer.writerows(rows)
         logger.success(f"Transform thanh cong {run_date}\n------------------------------------------------------")
+        log_ETL(run_date, "toCSV", "success", len(rows), f"da transform to CSV thanh cong")
+
 
     except Exception as e:
         logger.exception(f"da co loi {e}")
+        log_ETL(run_date, "toCSV", "failed", None, f"Co loi xay ra {e}")
+
         sys.exit(1)
 
 if __name__ == "__main__":

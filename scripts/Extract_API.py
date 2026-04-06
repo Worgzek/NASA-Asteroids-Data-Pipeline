@@ -5,10 +5,10 @@ import sys
 from datetime import datetime, timedelta
 from loguru import logger
 from dotenv import load_dotenv
+from db_log import log_ETL
 load_dotenv()
 API_KEY = os.getenv("NASA_API_KEY")
 # Import libraries
-
 run_date = sys.argv[1]
 LOG_FILE = f"/opt/airflow/logs/pipeline_{run_date}.log"
 logger.remove()
@@ -44,10 +44,16 @@ def extract_API(run_date):
         with open (filename,"w") as f:
             json.dump(data,f,indent=4)
         logger.success(f"Da luu thanh cong {filename}\n------------------------------------------------------")
+        
+        log_ETL(run_date, "extract", "success", None, f"Da luu thanh cong {filename}")
+
 
     except Exception as e:
         logger.exception(f"co loi xay ra {e}")
+        log_ETL(run_date, "extract", "failed", None, f"co loi xay ra {e}")
+
         sys.exit(1)
+
 
 if __name__ == "__main__":
     extract_API(run_date)

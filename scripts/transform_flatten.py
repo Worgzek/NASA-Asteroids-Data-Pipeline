@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from loguru import logger
+from db_log import log_ETL
 
 RAW = "/opt/airflow/data/raw"
 FLAT = "/opt/airflow/data/flatten"
@@ -43,9 +44,12 @@ def flatten_data(run_date):
         with open(output_file, "w") as f:
             json.dump(flat_list,f,indent=4)
         logger.success(f"flattened {run_date}\n------------------------------------------------------")
+        log_ETL(run_date, "flatten", "success", None, f"Da luu thanh cong {output_file}")
 
     except Exception as e:
         logger.exception(f"co loi {e}")
+        log_ETL(run_date, "flatten", "failed", None, f"Co loi xay ra {e}")
+
         sys.exit(1)
 
 if __name__ == "__main__":
