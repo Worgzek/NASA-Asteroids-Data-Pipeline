@@ -39,12 +39,15 @@ nasa_asteroid_ETL_Project
 │   ├── transform_data.py
 │   ├── load_postgres.py
 │   └── danger_score.py
+│   └── db_log.py
 │
 ├── data/
 │   ├── raw/
 │   ├── flatten/
 │   └── processed/
-│   └── init.sql
+│   └── sql/
+│        └── init.sql
+│        └── log.sql
 │
 ├── logs/
 │
@@ -126,7 +129,7 @@ docker compose up
 Access the Airflow UI:
 
 ```
-http://localhost:8081
+http://localhost:8181
 ```
 
 Default login credentials:
@@ -159,10 +162,24 @@ Data is stored in PostgreSQL database **nasa_neo** with the following tables:
 ```
 asteroids
 danger_score
+etl_log
 ```
 
 ### Table Columns
-
+**danger_level:**
+```
+asteroid_id
+name
+absolute_magnitude
+diameter_min_m
+diameter_max_m
+velocity_km_s
+miss_distance_km
+risk_score
+danger_level
+date
+```
+**danger_level:**
 ```
 asteroid_id
 name
@@ -173,7 +190,15 @@ risk_score
 danger_level
 date
 ```
-
+**etl_log:**
+```
+run_id
+step
+status
+records_processed
+message
+logged_at
+```
 ---
 
 # Logging
@@ -181,5 +206,6 @@ date
 Pipeline logs are stored in:
 
 ```
-logs/
+log file: logs/
+database: etl_log table at Postgres
 ```
