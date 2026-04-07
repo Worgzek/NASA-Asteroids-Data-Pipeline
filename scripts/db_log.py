@@ -24,6 +24,13 @@ def log_ETL(run_id, step, status, records_processed, message):
                 insert into etl_log(run_id,step,status,row_processed,message)
                 values
                 (%s, %s, %s, %s, %s)
+                on conflict (run_id,step)
+                do update set
+                status = excluded.status
+                ,row_processed = excluded.row_processed
+                ,message = excluded.message
+                ,logged_at = current_timestamp   
+                            
                 ''',(run_id, step, status, records_processed, message))
         conn.commit()
     except Exception as e:

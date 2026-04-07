@@ -107,7 +107,7 @@ def danger_score(run_date):
             """
         execute_values(cur,insert_query,results)
         conn.commit()
-        logger.success(f"da fetch thanh cong {len(results)} dong\n------------------------------------------------------")
+        logger.success(f"da them thanh cong {len(results)} dong\n------------------------------------------------------")
         log_ETL(run_date, "calculate danger level", "success", len(results), f"da load vao DB thanh cong")
 
     except Exception as e:
@@ -125,5 +125,3 @@ def danger_score(run_date):
             cur.close()
 if __name__ == "__main__":
     danger_score(run_date)
-
-
