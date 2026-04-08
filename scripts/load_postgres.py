@@ -93,7 +93,6 @@ def load_postgres(run_date):
             conn.close()
         if cur:
             cur.close()
-        logger.info("Da dong ket noi")
 
 if __name__ == "__main__":
     run_date = sys.argv[1]
